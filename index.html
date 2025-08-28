@@ -17,7 +17,19 @@
 <body>
     <canvas id="myCanvas" width="700" height="500"></canvas>
     <script>
-        
+        const ctx = myCanvas.getContext("2d");
+
+        ctx.beginPath();
+        ctx.ellipse(
+            myCanvas.width /2,
+            myCanvas.height /2,
+            100,
+            50,
+            0,
+            0,
+            Math.PI * 2
+        );
+        ctx.stroke();
     </script>
 </body>
 </html>
