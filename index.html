@@ -16,20 +16,33 @@
 </head>
 <body>
     <canvas id="myCanvas" width="700" height="500"></canvas>
+    <script src="phoneControls.js"></script>
     <script>
         const ctx = myCanvas.getContext("2d");
+        let rotation = 0;
+        const controls = new PhoneControls(myCanvas);
 
-        ctx.beginPath();
-        ctx.ellipse(
-            myCanvas.width /2,
-            myCanvas.height /2,
-            100,
-            50,
-            0,
-            0,
-            Math.PI * 2
-        );
-        ctx.stroke();
+        animate();
+
+        function animate(){
+            
+            
+            ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+
+            ctx.beginPath();
+            ctx.ellipse(
+                myCanvas.width /2,
+                myCanvas.height /2,
+                100,
+                50,
+                rotation,
+                0,
+                Math.PI * 2
+            );  
+            ctx.stroke();
+
+            requestAnimationFrame(animate); 
+        }
     </script>
 </body>
 </html>
