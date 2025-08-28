@@ -3,46 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phone tilt exp</title>
+    <title>Charades Tilt Game</title>
     <style>
-        canvas {
-            background-color: indigo;
-            top: 50%;
-            left: 50%;
-            position: absolute;
-            transform: translate(-50%, -50%);
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #333;
+            color: white;
+            transition: background-color 0.5s ease-in-out;
+            text-align: center;
+            user-select: none; /* Prevents text selection */
         }
+
+        .game-container {
+            width: 90vw;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #444;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+        }
+
+        #word-display {
+            font-size: 8vw;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        #timer, #score {
+            font-size: 4vw;
+            margin-top: 20px;
+        }
+
+        .correct { background-color: #28a745; }
+        .skip { background-color: #dc3545; }
+        .neutral { background-color: #444; }
     </style>
 </head>
 <body>
-    <canvas id="myCanvas" width="700" height="500"></canvas>
+    <div class="game-container" id="game-container">
+        <div id="word-display">Tap to Start</div>
+        <div id="timer">60</div>
+        <div id="score">Score: 0</div>
+    </div>
+
     <script src="phoneControls.js"></script>
     <script>
-        const ctx = myCanvas.getContext("2d");
-        let rotation = 0;
-        const controls = new PhoneControls(myCanvas);
+        // Main Game Logic
+        const gameContainer = document.getElementById('game-container');
+        const wordDisplay = document.getElementById('word-display');
+        const timerDisplay = document.getElementById('timer');
+        const scoreDisplay = document.getElementById('score');
 
-        animate();
+        // Sample word list
+        const wordList = ["Apple", "Banana", "Cat", "Dog", "Elephant", "Guitar", "Soccer", "Telescope", "Rainbow", "Volcano"];
 
-        function animate(){
-            
-            
-            ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+        let currentWordIndex = 0;
+        let score = 0;
+        let timeLeft = 60;
+        let timerInterval;
+        let isPlaying = false;
 
-            ctx.beginPath();
-            ctx.ellipse(
-                myCanvas.width /2,
-                myCanvas.height /2,
-                100,
-                50,
-                rotation,
-                0,
-                Math.PI * 2
-            );  
-            ctx.stroke();
+        const startGame = () => {
+            if (isPlaying) return;
+            isPlaying = true;
+            score = 0;
+            timeLeft = 60;
+            currentWordIndex = 0;
+            updateScore();
+            setWord();
+            gameContainer.classList.remove('correct', 'skip');
+            startTimer();
+        };
 
-            requestAnimationFrame(animate); 
-        }
+        const startTimer = () => {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        };
+
+        const endGame = () => {
+            clearInterval(timerInterval);
+            isPlaying = false;
+            wordDisplay.textContent = "Game Over!";
+            timerDisplay.textContent = "Time's Up!";
+        };
+
+        const setWord = () => {
+            if (currentWordIndex >= wordList.length) {
+                endGame(); // No more words
+                return;
+            }
+            wordDisplay.textContent = wordList[currentWordIndex];
+        };
+
+        const handleCorrectGuess = () => {
+            score++;
+            updateScore();
+            nextWord();
+            visualFeedback('correct');
+        };
+
+        const handleSkipWord = () => {
+            nextWord();
+            visualFeedback('skip');
+        };
+
+        const nextWord = () => {
+            currentWordIndex = (currentWordIndex + 1) % wordList.length; // Loop through words
+            setWord();
+        };
+
+        const updateScore = () => {
+            scoreDisplay.textContent = `Score: ${score}`;
+        };
+
+        const visualFeedback = (type) => {
+            gameContainer.classList.add(type);
+            gameContainer.classList.remove(type === 'correct' ? 'skip' : 'correct');
+            setTimeout(() => {
+                gameContainer.classList.remove(type);
+            }, 500); // Remove color after 0.5 seconds
+        };
+
+        // Attach event listeners
+        gameContainer.addEventListener('click', startGame);
+
+        // Initialize controls
+        const controls = new PhoneControls({
+            correctGuess: handleCorrectGuess,
+            skipWord: handleSkipWord
+        });
     </script>
 </body>
 </html>
