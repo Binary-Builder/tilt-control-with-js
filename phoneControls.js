@@ -43,4 +43,4 @@ class PhoneControls {
             }
         }
     }
-}
+} //this mofo not working bruh
